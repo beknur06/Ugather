@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:nu}?useUnicode=yes&characterEncoding=UTF-8
+    username: ${DB_USER:postgres}
+    password: ${DB_PWD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+server:
+   port: 8080
+
+security:
+  jwt:
+    token:
+      secret-key: secret-key
+      expire-length: 3000000
+
+UserController:
+  signin: Authenticates user and returns its JWT token.
+  signup: Creates user and returns its JWT token
+  delete: Deletes specific user by username
+  search: Returns specific user by username
+  me: Returns current user's data
