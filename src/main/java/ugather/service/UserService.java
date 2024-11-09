@@ -37,7 +37,8 @@ public class UserService {
     }
   }
 
-  public String signin(String username, String password) {
+  public String signin(String email, String password) {
+    String username = userRepository.findByEmail(email).getUsername();
     try {
       authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
       return jwtTokenProvider.createToken(username);
