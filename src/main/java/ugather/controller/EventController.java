@@ -13,6 +13,7 @@ import ugather.dto.EventFilterRequestBody;
 import ugather.service.EventService;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -40,22 +41,28 @@ public class EventController {
         return eventService.filterEvents(filterRequestBody, pageable);
     }
 
+    @Operation(summary = "Search events")
+    @GetMapping("/search")
+    public Page<EventDto> searchEvents(@RequestParam String keyword, Pageable pageable) {
+        return eventService.searchEvents(keyword, pageable);
+    }
+
     @Operation(summary = "Get trending events")
     @GetMapping("/trending")
-    public Page<EventDto> getTrendingEvents(Pageable pageable) {
-        return eventService.getTrendingEvents(pageable);
+    public List<EventDto> getTrendingEvents() {
+        return eventService.getTrendingEvents();
     }
 
     @Operation(summary = "Get upcoming events")
     @GetMapping("/upcoming")
-    public Page<EventDto> getUpcomingEvents(Pageable pageable) {
-        return eventService.getUpcomingEvents(pageable);
+    public List<EventDto> getUpcomingEvents() {
+        return eventService.getUpcomingEvents();
     }
 
     @Operation(summary = "Get today's events")
     @GetMapping("/today")
-    public Page<EventDto> getTodayEvents(Pageable pageable) {
-        return eventService.getTodayEvents(pageable);
+    public List<EventDto> getTodayEvents() {
+        return eventService.getTodayEvents();
     }
 
     @Operation(summary = "Create a new event")
@@ -82,4 +89,6 @@ public class EventController {
     public Page<EventDto> getEventsByUserId(@PathVariable Integer userId, Pageable pageable) {
         return eventService.getEventsByUserId(userId, pageable);
     }
+
+
 }

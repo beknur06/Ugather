@@ -21,6 +21,7 @@ import ugather.util.MapStructConverter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -50,19 +51,19 @@ public class EventService {
         return eventRepository.findById(id).map(mapStructConverter::eventToEventDto);
     }
 
-    public Page<EventDto> getTodayEvents(Pageable pageable) {
+    public List<EventDto> getTodayEvents() {
         LocalDateTime startOfDay = LocalDateTime.now().with(LocalTime.MIN);
         LocalDateTime endOfDay = LocalDateTime.now().with(LocalTime.MAX);
-        return eventRepository.findTodayEvents(startOfDay, endOfDay, pageable).map(mapStructConverter::eventToEventDto);
+        return eventRepository.findTodayEvents(startOfDay, endOfDay).stream().map(mapStructConverter::eventToEventDto).toList();
     }
 
-    public Page<EventDto> getTrendingEvents(Pageable pageable) {
-        return eventRepository.findTrendingEvents(pageable).map(mapStructConverter::eventToEventDto);
+    public List<EventDto> getTrendingEvents() {
+        return eventRepository.findTrendingEvents().stream().map(mapStructConverter::eventToEventDto).toList();
     }
 
-    public Page<EventDto> getUpcomingEvents(Pageable pageable) {
+    public List<EventDto> getUpcomingEvents() {
         LocalDateTime now = LocalDateTime.now();
-        return eventRepository.findUpcomingEventsSorted(now, pageable).map(mapStructConverter::eventToEventDto);
+        return eventRepository.findUpcomingEventsSorted(now).stream().map(mapStructConverter::eventToEventDto).toList();
     }
 
     public Page<EventDto> filterEvents(EventFilterRequestBody filterRequestBody, Pageable pageable) {
@@ -70,16 +71,12 @@ public class EventService {
                 .map(mapStructConverter::eventToEventDto);
     }
 
-    public void createEvent(EventCreatRequestDto eventCreatRequestDto, MultipartFile file) throws IOException {
-        EventDto eventDto = new EventDto();
+    public Page<EventDto> searchEvents(String keyword, Pageable pageable) {
+        return eventRepository.searchEventsByKeyword(keyword, pageable).map(mapStructConverter::eventToEventDto);
+    }
 
-        eventDto.setStartDateTime(eventCreatRequestDto.getStartDateTime());
-        eventDto.setEndDateTime(eventCreatRequestDto.getEndDateTime());
-        eventDto.setCapacity(eventCreatRequestDto.getCapacity());
-        eventDto.setRegistered(0);
-        eventDto.setDescription(eventCreatRequestDto.getDescription());
-        eventDto.setLocation(eventCreatRequestDto.getLocation());
-        eventDto.setEventType(eventCreatRequestDto.getEventType());
+    public void createEvent(EventCreatRequestDto eventCreatRequestDto, MultipartFile file) throws IOException {
+        EventDto eventDto = getEventDto(eventCreatRequestDto);
 
         Event event = mapStructConverter.eventDtoToEvent(eventDto);
 
@@ -96,6 +93,20 @@ public class EventService {
         eventRepository.save(event);
     }
 
+    private static EventDto getEventDto(EventCreatRequestDto eventCreatRequestDto) {
+        EventDto eventDto = new EventDto();
+
+        eventDto.setTitle(eventCreatRequestDto.getTitle());
+        eventDto.setStartDateTime(eventCreatRequestDto.getStartDateTime());
+        eventDto.setEndDateTime(eventCreatRequestDto.getEndDateTime());
+        eventDto.setCapacity(eventCreatRequestDto.getCapacity());
+        eventDto.setRegistered(0);
+        eventDto.setDescription(eventCreatRequestDto.getDescription());
+        eventDto.setLocation(eventCreatRequestDto.getLocation());
+        eventDto.setEventType(eventCreatRequestDto.getEventType());
+        return eventDto;
+    }
+
     private String saveFileLocally(MultipartFile file) throws IOException {
         String fileName = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
         Path filePath = Paths.get(uploadDir, fileName);
@@ -107,6 +118,9 @@ public class EventService {
     public void updateEvent(Integer id, EventDto eventDto) {
         Event event = eventRepository.findById(id).orElseThrow(() -> new RuntimeException("Event not found"));
 
+        if (eventDto.getTitle() != null) {
+            event.setTitle(eventDto.getTitle());
+        }
         if (eventDto.getStartDateTime() != null) {
             event.setStartDateTime(eventDto.getStartDateTime());
         }

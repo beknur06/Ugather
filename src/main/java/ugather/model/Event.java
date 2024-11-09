@@ -14,6 +14,7 @@ public class Event {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
+  private String title;
   private LocalDateTime startDateTime;
   private LocalDateTime endDateTime;
   private Integer capacity;
@@ -22,7 +23,6 @@ public class Event {
   private String location;
   private EventType eventType;
   private String fileUrl;
-
   @ManyToOne
   private AppUser appUser;
 }

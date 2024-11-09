@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class EventCreatRequestDto {
+    private String title;
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
     private Integer capacity;
