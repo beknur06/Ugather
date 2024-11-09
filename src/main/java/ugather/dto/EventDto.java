@@ -15,5 +15,6 @@ public class EventDto {
     private String description;
     private String location;
     private EventType eventType;
+    private String fileUrl;
     private AppUserDto appUser;
 }

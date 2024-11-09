@@ -34,7 +34,7 @@ public class BookingService {
         event.setRegistered(event.getRegistered() + 1);
         eventRepository.save(event);
 
-        sendConfirmationEmail(email, event);
+//        sendConfirmationEmail(email, event);
     }
 
     private void sendConfirmationEmail(String email, Event event) {

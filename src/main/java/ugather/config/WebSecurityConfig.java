@@ -1,5 +1,6 @@
 package ugather.config;
 
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import ugather.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -28,22 +29,24 @@ public class WebSecurityConfig {
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http.csrf().disable();
-    http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-    http.authorizeHttpRequests()
+    http.csrf(AbstractHttpConfigurer::disable);
+    http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+    http.authorizeHttpRequests(auth -> auth
             .requestMatchers("/users/signin").permitAll()
             .requestMatchers("/users/signup").permitAll()
             .requestMatchers("/h2-console/**").permitAll()
-            .anyRequest().authenticated();
+            .requestMatchers("/v3/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+            .anyRequest().authenticated()
+    );
 
-    http.exceptionHandling().accessDeniedPage("/login");
+    http.exceptionHandling(exception -> exception.accessDeniedPage("/login"));
 
     http.apply(new JwtTokenFilterConfigurer(jwtTokenProvider));
     return http.build();
-  }
+}
 
-  @Bean
-  public WebSecurityCustomizer webSecurityCustomizer() {
+@Bean
+public WebSecurityCustomizer webSecurityCustomizer() {
     return (web) -> web.ignoring()
             .requestMatchers("/v2/api-docs")
             .requestMatchers("/swagger-resources/**")
@@ -51,8 +54,10 @@ public class WebSecurityConfig {
             .requestMatchers("/configuration/**")
             .requestMatchers("/webjars/**")
             .requestMatchers("/public")
-            .requestMatchers("/h2-console/**");
-  }
+            .requestMatchers("/h2-console/**")
+            .requestMatchers("/v3/api-docs")
+            .requestMatchers("/v3/api-docs.yaml");
+}
 
   @Bean
   public PasswordEncoder passwordEncoder() {

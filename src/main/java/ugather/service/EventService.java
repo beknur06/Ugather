@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import ugather.dto.EventCreatRequestDto;
 import ugather.dto.EventDto;
 import ugather.dto.EventFilterRequestBody;
@@ -17,9 +18,16 @@ import ugather.repository.AppUserRepository;
 import ugather.repository.EventRepository;
 import ugather.util.MapStructConverter;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Value;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +38,9 @@ public class EventService {
 
     @Autowired
     MapStructConverter mapStructConverter;
+
+    @Value("${file.upload-dir}")
+    private String uploadDir;
 
     public Page<EventDto> getAllEvents(Pageable pageable) {
         return eventRepository.findAll(pageable).map(mapStructConverter::eventToEventDto);
@@ -59,7 +70,7 @@ public class EventService {
                 .map(mapStructConverter::eventToEventDto);
     }
 
-    public void createEvent(EventCreatRequestDto eventCreatRequestDto) {
+    public void createEvent(EventCreatRequestDto eventCreatRequestDto, MultipartFile file) throws IOException {
         EventDto eventDto = new EventDto();
 
         eventDto.setStartDateTime(eventCreatRequestDto.getStartDateTime());
@@ -77,7 +88,20 @@ public class EventService {
         AppUser appUser = appUserRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
         event.setAppUser(appUser);
 
+        if (file != null && !file.isEmpty()) {
+            String fileUrl = saveFileLocally(file);
+            event.setFileUrl(fileUrl);
+        }
+
         eventRepository.save(event);
+    }
+
+    private String saveFileLocally(MultipartFile file) throws IOException {
+        String fileName = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
+        Path filePath = Paths.get(uploadDir, fileName);
+        Files.createDirectories(filePath.getParent());
+        Files.copy(file.getInputStream(), filePath);
+        return filePath.toString();
     }
 
     public void updateEvent(Integer id, EventDto eventDto) {

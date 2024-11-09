@@ -8,17 +8,22 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: nuugather@gmail.com
-    password: nuugather123
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
+#  mail:
+#    host: smtp.google.com
+#    port: 587
+#    username:
+#    password:
+#    properties:
+#      mail:
+#        smtp:
+#          auth: true
+#          starttls:
+#            enable: true
+
+file:
+  upload-dir: C:\Users\Krypton\Desktop\Shit_Project\cep\ugather\photos
+
+
 server:
    port: 8080
 

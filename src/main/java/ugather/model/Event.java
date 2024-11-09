@@ -21,6 +21,7 @@ public class Event {
   private String description;
   private String location;
   private EventType eventType;
+  private String fileUrl;
 
   @ManyToOne
   private AppUser appUser;

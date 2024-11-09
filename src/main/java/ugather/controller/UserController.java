@@ -11,11 +11,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import ugather.dto.AppUserDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 import ugather.service.UserService;
 
 @RestController
@@ -23,32 +24,33 @@ import ugather.service.UserService;
 @RequiredArgsConstructor
 public class UserController {
 
-  private final UserService userService;
-  private final ModelMapper modelMapper;
+    private final UserService userService;
+    private final ModelMapper modelMapper;
 
-  @PostMapping("/signin")
-  @ApiOperation(value = "${UserController.signin}")
-  @ApiResponses(value = {
-          @ApiResponse(code = 400, message = "Something went wrong"),
-          @ApiResponse(code = 422, message = "Invalid email/password supplied")})
-  public String login(
-          @ApiParam("Email") @RequestParam String email,
-          @ApiParam("Password") @RequestParam String password) {
-    return userService.signin(email, password);
-  }
+    @PostMapping("/signin")
+    @Operation(summary = "User Signin", description = "User login with email and password")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "Something went wrong"),
+            @ApiResponse(responseCode = "422", description = "Invalid email/password supplied")})
+    public String login(
+            @RequestParam String email,
+            @RequestParam String password) {
+        return userService.signin(email, password);
+    }
 
-  @PostMapping("/signup")
-  @ApiOperation(value = "${UserController.signup}")
-  @ApiResponses(value = {
-          @ApiResponse(code = 400, message = "Something went wrong"),
-          @ApiResponse(code = 403, message = "Access denied"),
-          @ApiResponse(code = 422, message = "Email is already in use")})
-  public String signup(@ApiParam("Signup User") @RequestBody AppUserCreatDto user) {
-    return userService.signup(modelMapper.map(user, AppUser.class));
-  }
+    @PostMapping("/signup")
+    @Operation(summary = "User Signup", description = "User registration with email and password")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "Something went wrong"),
+            @ApiResponse(responseCode = "403", description = "Access denied"),
+            @ApiResponse(responseCode = "422", description = "Email is already in use")})
+    public String signup(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Signup User", required = true, content = @Content(schema = @Schema(implementation = AppUserCreatDto.class))) @RequestBody AppUserCreatDto user) {
+        return userService.signup(modelMapper.map(user, AppUser.class));
+    }
 
-  @GetMapping("/refresh")
-  public String refresh(HttpServletRequest req) {
-    return userService.refresh(req.getRemoteUser());
-  }
+    @GetMapping("/refresh")
+    @Operation(summary = "Refresh Token", description = "Refresh user token")
+    public String refresh(HttpServletRequest req) {
+        return userService.refresh(req.getRemoteUser());
+    }
 }

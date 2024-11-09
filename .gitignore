@@ -24,3 +24,4 @@ nbdist/
 .nb-gradle/
 .vscode/settings.json
 /.github/
+/photos/
