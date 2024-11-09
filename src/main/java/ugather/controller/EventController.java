@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import ugather.dto.EventCreatRequestDto;
 import ugather.dto.EventDto;
+import ugather.dto.EventFilterRequestBody;
 import ugather.service.EventService;
 
 import java.util.Optional;
@@ -26,6 +27,26 @@ public class EventController {
     @GetMapping("/{id}")
     public Optional<EventDto> getEventById(@PathVariable Integer id) {
         return eventService.getEventById(id);
+    }
+
+    @PostMapping("/filter")
+    public Page<EventDto> filterEvents(@RequestBody EventFilterRequestBody filterRequestBody, Pageable pageable) {
+        return eventService.filterEvents(filterRequestBody, pageable);
+    }
+
+    @GetMapping("/trending")
+    public Page<EventDto> getTrendingEvents(Pageable pageable) {
+        return eventService.getTrendingEvents(pageable);
+    }
+
+    @GetMapping("/upcoming")
+    public Page<EventDto> getUpcomingEvents(Pageable pageable) {
+        return eventService.getUpcomingEvents(pageable);
+    }
+
+    @GetMapping("/today")
+    public Page<EventDto> getTodayEvents(Pageable pageable) {
+        return eventService.getTodayEvents(pageable);
     }
 
     @PostMapping

@@ -4,17 +4,21 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import ugather.dto.EventCreatRequestDto;
 import ugather.dto.EventDto;
+import ugather.dto.EventFilterRequestBody;
 import ugather.model.AppUser;
 import ugather.model.Event;
 import ugather.repository.AppUserRepository;
 import ugather.repository.EventRepository;
 import ugather.util.MapStructConverter;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Optional;
 
 @Service
@@ -33,6 +37,26 @@ public class EventService {
 
     public Optional<EventDto> getEventById(Integer id) {
         return eventRepository.findById(id).map(mapStructConverter::eventToEventDto);
+    }
+
+    public Page<EventDto> getTodayEvents(Pageable pageable) {
+        LocalDateTime startOfDay = LocalDateTime.now().with(LocalTime.MIN);
+        LocalDateTime endOfDay = LocalDateTime.now().with(LocalTime.MAX);
+        return eventRepository.findTodayEvents(startOfDay, endOfDay, pageable).map(mapStructConverter::eventToEventDto);
+    }
+
+    public Page<EventDto> getTrendingEvents(Pageable pageable) {
+        return eventRepository.findTrendingEvents(pageable).map(mapStructConverter::eventToEventDto);
+    }
+
+    public Page<EventDto> getUpcomingEvents(Pageable pageable) {
+        LocalDateTime now = LocalDateTime.now();
+        return eventRepository.findUpcomingEventsSorted(now, pageable).map(mapStructConverter::eventToEventDto);
+    }
+
+    public Page<EventDto> filterEvents(EventFilterRequestBody filterRequestBody, Pageable pageable) {
+        return eventRepository.findByEventTypeIsIn(filterRequestBody.getEventTypes(), pageable)
+                .map(mapStructConverter::eventToEventDto);
     }
 
     public void createEvent(EventCreatRequestDto eventCreatRequestDto) {
@@ -86,6 +110,12 @@ public class EventService {
 
     public void deleteEvent(Integer id) {
         eventRepository.deleteById(id);
+    }
+
+    @Scheduled(cron = "0 */1 * * * ?") // Runs every 1 minutes
+    public void deleteFinishedEvents() {
+        LocalDateTime now = LocalDateTime.now();
+        eventRepository.deleteFinishedEvents(now);
     }
 
     public Page<EventDto> getEventsByUserId(Integer userId, Pageable pageable) {
