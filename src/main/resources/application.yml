@@ -21,7 +21,7 @@ spring:
 #            enable: true
 
 file:
-  upload-dir: C:\Users\Krypton\Desktop\Shit_Project\cep\ugather\photos
+  upload-dir: C:\Users\Krypton\Desktop\Shit_Project\cep\uconnect\public
 
 
 server:
