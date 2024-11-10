@@ -34,6 +34,7 @@ public class WebSecurityConfig {
     http.authorizeHttpRequests(auth -> auth
             .requestMatchers("/users/signin").permitAll()
             .requestMatchers("/users/signup").permitAll()
+            .requestMatchers("/events/**").permitAll()
             .requestMatchers("/h2-console/**").permitAll()
             .requestMatchers("/v3/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
             .anyRequest().authenticated()
