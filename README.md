@@ -3,8 +3,8 @@
 # Ugather Application
 
 ## Overview
-Ugather is a Spring Boot application designed to manage events. It provides functionalities to create, update, delete, and search for events. The application also includes user authentication and authorization using JWT tokens.
-
+Ugather is a Spring Boot application designed to manage events of the University. It provides functionalities to create, update, delete, and search for events. The application also includes user authentication and authorization using JWT tokens.
+Stack: Java, Spring Boot, Spring Security, Maven, Postgres, JWT, Swagger, MapStruct, Lombok.
 ## Technologies Used
 - Java
 - Spring Boot
