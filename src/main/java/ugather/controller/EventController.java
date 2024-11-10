@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ugather.dto.EventCreatRequestDto;
+import ugather.dto.EventCreateRequest;
 import ugather.dto.EventDto;
 import ugather.dto.EventFilterRequestBody;
 import ugather.service.EventService;
@@ -67,9 +68,8 @@ public class EventController {
 
     @Operation(summary = "Create a new event")
     @PostMapping
-    public void createEvent(@RequestPart("event") EventCreatRequestDto eventCreatRequestDto,
-                            @RequestPart("file") MultipartFile file) throws IOException {
-        eventService.createEvent(eventCreatRequestDto, file);
+    public void createEvent(@RequestBody EventCreateRequest eventCreateRequest) throws IOException {
+        eventService.createEvent(eventCreateRequest.getEvent(), eventCreateRequest.getFile());
     }
 
     @Operation(summary = "Update an event")

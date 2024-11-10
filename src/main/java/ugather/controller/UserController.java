@@ -3,6 +3,7 @@ package ugather.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import ugather.dto.AppUserCreatDto;
+import ugather.dto.Login;
 import ugather.model.AppUser;
 import org.modelmapper.ModelMapper;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,10 +33,8 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "Something went wrong"),
             @ApiResponse(responseCode = "422", description = "Invalid email/password supplied")})
-    public String login(
-            @RequestParam String email,
-            @RequestParam String password) {
-        return userService.signin(email, password);
+    public String login(@RequestBody Login login) {
+        return userService.signin(login.getEmail(), login.getPassword());
     }
 
     @PostMapping("/signup")
